@@ -1,0 +1,1325 @@
+{
+	"info": {
+		"_postman_id": "ff0458f6-9c1a-45b6-9f05-8709e32e1c93",
+		"name": "Firely-Server Collection!",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "R4",
+			"item": [
+				{
+					"name": "Instance & Type Level Interactions",
+					"item": [
+						{
+							"name": "Patient Resource",
+							"item": [
+								{
+									"name": "UC_00_List of patients from FirelyServer!",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "8b87bd99-4d33-443e-ad6c-dc63a8771fd4",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {\r",
+													"    pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Value is in valid list\", () => {\r",
+													"  pm.expect(pm.response.json().resourceType).to.be.contains(\"Bundle\");\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "05e8c817-d858-4941-bc66-922e855ddb17",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/fhir+json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{c_base_url}}/R4/Patient"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_01_New Patient Padma created in Firely Server",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "a8a1dd09-fb01-451e-9299-8ce4115cc4f8",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 201\", function () {\r",
+													"            pm.response.to.have.status(201);\r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"Status code name has string\", () => {\r",
+													"            pm.response.to.have.status(\"Created\");\r",
+													"        })\r",
+													"\r",
+													"        pm.test(\"Content-Type header is present\", () => {\r",
+													"        pm.response.to.have.header(\"Content-Type\");\r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"Content-Type header is application/fhir+json\", () => {\r",
+													"        pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/fhir+json; fhirVersion=4.0; charset=utf-8');\r",
+													"        \r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"patient is created and patientId is captured.\", () => {\r",
+													"            var jsonData = JSON.parse(responseBody);\r",
+													"            pm.collectionVariables.set(\"c_patient_id\", jsonData.id);\r",
+													"        });\r",
+													"}      \r",
+													"\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "fec80397-1dcd-4c6e-9b33-5ec533648298",
+												"exec": [
+													"try{\r",
+													"        \r",
+													"    data = pm.request.body;\r",
+													"    body = data[data.mode];\r",
+													"    jsonData = JSON.parse(body);\r",
+													"    console.log(jsonData.resourceType)\r",
+													"    console.log(jsonData.text)\r",
+													"\r",
+													"    pm.test(\"Identifier is an array\", function () {\r",
+													"            pm.expect(jsonData.identifier).to.be.an(\"array\");\r",
+													"    });\r",
+													"    \r",
+													"    pm.test(\"Identifier is an array\", function () {\r",
+													"            pm.expect(jsonData.text).to.be.a(\"object\");\r",
+													"    });\r",
+													"\r",
+													"    pm.test(\"Identifier is an array\", function () {\r",
+													"            pm.expect(jsonData.gender).to.be.oneOf([\"male\", \"female\"]);\r",
+													"    });    \r",
+													"\r",
+													"    pm.test(\"Checking length of the family name in the payload\", function () {\r",
+													"            \r",
+													"        arrayOfObject = jsonData.name[0].family\r",
+													"        let family_name = arrayOfObject.toString();  \r",
+													"        console.log(\"length of family name :\", (family_name).length)\r",
+													"    });   \r",
+													"\r",
+													"    pm.test(\"Checking input name in the array and making it to collection var\", function () {\r",
+													"            \r",
+													"        arrayOfObject = jsonData.name[0].given[0]\r",
+													"        if (arrayOfObject == \"vathi\"){\r",
+													"            var input_patient_name = arrayOfObject\r",
+													"            }\r",
+													"        pm.collectionVariables.set(\"c_ip_pname\", input_patient_name)\r",
+													"        console.log(arrayOfObject)\r",
+													"    });    \r",
+													"      \r",
+													"}\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "4daadffd-81fc-4677-b9f0-275eccfa7a3c",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/fhir+json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"resourceType\": \"Patient\",\r\n  \"text\": {\r\n    \"status\": \"generated\",\r\n    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">\\n      \\n      <p>Patient Donald DUCK @ Acme Healthcare, Inc. MR = 654321</p>\\n    \\n    </div>\"\r\n  },\r\n  \"identifier\": [\r\n    {\r\n      \"use\": \"usual\",\r\n      \"type\": {\r\n        \"coding\": [\r\n          {\r\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\r\n            \"code\": \"MRs\"\r\n          }\r\n        ]\r\n      },\r\n      \"system\": \"urn:oid:0.1.2.3.4.5.6.7\",\r\n      \"value\": \"654321\"\r\n    }\r\n  ],\r\n  \"active\": true,\r\n  \"name\": [\r\n    {\r\n      \"use\": \"official\",\r\n      \"family\": \"Padma\",\r\n      \"given\": [\r\n        \"vathi\"\r\n      ]\r\n    }\r\n  ],\r\n  \"gender\": \"female\",\r\n  \"photo\": [\r\n    {\r\n      \"contentType\": \"image/gif\",\r\n      \"data\": \"R0lGODlhEwARAPcAAAAAAAAA/+9aAO+1AP/WAP/eAP/eCP/eEP/eGP/nAP/nCP/nEP/nIf/nKf/nUv/nWv/vAP/vCP/vEP/vGP/vIf/vKf/vMf/vOf/vWv/vY//va//vjP/3c//3lP/3nP//tf//vf///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////yH5BAEAAAEALAAAAAATABEAAAi+AAMIDDCgYMGBCBMSvMCQ4QCFCQcwDBGCA4cLDyEGECDxAoAQHjxwyKhQAMeGIUOSJJjRpIAGDS5wCDly4AALFlYOgHlBwwOSNydM0AmzwYGjBi8IHWoTgQYORg8QIGDAwAKhESI8HIDgwQaRDI1WXXAhK9MBBzZ8/XDxQoUFZC9IiCBh6wEHGz6IbNuwQoSpWxEgyLCXL8O/gAnylNlW6AUEBRIL7Og3KwQIiCXb9HsZQoIEUzUjNEiaNMKAAAA7\"\r\n    }\r\n  ],\r\n  \"contact\": [\r\n    {\r\n      \"relationship\": [\r\n        {\r\n          \"coding\": [\r\n            {\r\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0131\",\r\n              \"code\": \"E\"\r\n            }\r\n          ]\r\n        }\r\n      ],\r\n      \"organization\": {\r\n        \"reference\": \"Organization/1\",\r\n        \"display\": \"Walt Disney Corporation\"\r\n      }\r\n    }\r\n  ],\r\n  \"managingOrganization\": {\r\n    \"reference\": \"Organization/1\",\r\n    \"display\": \"ACME Healthcare, Inc\"\r\n  },\r\n  \"link\": [\r\n    {\r\n      \"other\": {\r\n        \"reference\": \"Patient/pat2\"\r\n      },\r\n      \"type\": \"seealso\"\r\n    }\r\n  ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{c_base_url}}/R4/Patient"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_02_upserting patient Padma details!",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "0cad94fe-c3c3-4ef8-8706-784569f94395",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"patient exists or not?\", () => {\r",
+													"                    var jsonData = JSON.parse(responseBody);\r",
+													"                    \r",
+													"                    var patient_id = pm.collectionVariables.get(\"c_patient_id\")\r",
+													"                    var current_patient_id_from_output = jsonData.id\r",
+													"                    if (patient_id == current_patient_id_from_output){\r",
+													"                        console.log(\"== patient already exists, only updates ==>\", jsonData)\r",
+													"                    }\r",
+													"                    else{\r",
+													"                        console.log(\"== patient doesn't exists, new patient is created with updated fields ==>\", current_patient_id_from_output,jsonData)\r",
+													"                        c_patient_id = current_patient_id_from_output \r",
+													"                    }\r",
+													"         \r",
+													"})\r",
+													"}\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "52254921-8536-48f4-9568-ae6dbbb53d99",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/fhir+json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"resourceType\": \"Patient\",\r\n  \"id\": \"{{c_patient_id}}\",\r\n  \"text\": {\r\n    \"status\": \"generated\",\r\n    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">\\n      \\n      <p>Patient Donald DUCK @ Acme Healthcare, Inc. MR = 654321</p>\\n    \\n    </div>\"\r\n  },\r\n  \"identifier\": [\r\n    {\r\n      \"use\": \"usual\",\r\n      \"type\": {\r\n        \"coding\": [\r\n          {\r\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\r\n            \"code\": \"MR\"\r\n          }\r\n        ]\r\n      },\r\n      \"system\": \"urn:oid:0.1.2.3.4.5.6.7\",\r\n      \"value\": \"654321\"\r\n    }\r\n  ],\r\n  \"active\": true,\r\n  \"name\": [\r\n    {\r\n      \"use\": \"official\",\r\n      \"family\": \"Dishita\",\r\n      \"given\": [\r\n        \"BetalaPut\"\r\n      ]\r\n    }\r\n  ],\r\n  \"gender\": \"female\",\r\n  \"photo\": [\r\n    {\r\n      \"contentType\": \"image/gif\",\r\n      \"data\": \"R0lGODlhEwARAPcAAAAAAAAA/+9aAO+1AP/WAP/eAP/eCP/eEP/eGP/nAP/nCP/nEP/nIf/nKf/nUv/nWv/vAP/vCP/vEP/vGP/vIf/vKf/vMf/vOf/vWv/vY//va//vjP/3c//3lP/3nP//tf//vf///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////yH5BAEAAAEALAAAAAATABEAAAi+AAMIDDCgYMGBCBMSvMCQ4QCFCQcwDBGCA4cLDyEGECDxAoAQHjxwyKhQAMeGIUOSJJjRpIAGDS5wCDly4AALFlYOgHlBwwOSNydM0AmzwYGjBi8IHWoTgQYORg8QIGDAwAKhESI8HIDgwQaRDI1WXXAhK9MBBzZ8/XDxQoUFZC9IiCBh6wEHGz6IbNuwQoSpWxEgyLCXL8O/gAnylNlW6AUEBRIL7Og3KwQIiCXb9HsZQoIEUzUjNEiaNMKAAAA7\"\r\n    }\r\n  ],\r\n  \"contact\": [\r\n    {\r\n      \"relationship\": [\r\n        {\r\n          \"coding\": [\r\n            {\r\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0131\",\r\n              \"code\": \"E\"\r\n            }\r\n          ]\r\n        }\r\n      ],\r\n      \"organization\": {\r\n        \"reference\": \"Organization/1\",\r\n        \"display\": \"Walt Disney Corporation\"\r\n      }\r\n    }\r\n  ],\r\n  \"managingOrganization\": {\r\n    \"reference\": \"Organization/1\",\r\n    \"display\": \"ACME Healthcare, Inc\"\r\n  },\r\n  \"link\": [\r\n    {\r\n      \"other\": {\r\n        \"reference\": \"Patient/pat2\"\r\n      },\r\n      \"type\": \"seealso\"\r\n    }\r\n  ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{c_base_url}}/R4/Patient/{{c_patient_id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_03_updating Patient Padma details with replace name!",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f25474e5-697b-4448-a4ba-8d2e9e08746a",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"patient is updated and patient name is captured.\", () => {\r",
+													"            let jsonData = JSON.parse(responseBody);\r",
+													"            //postman.setGlobalVariable(\"uc_patient_name\", jsonData.name[0]);\r",
+													"        });   \r",
+													"\r",
+													"        pm.test(\"patient is updated and patient family name is captured.\", () => {\r",
+													"            let jsonData = JSON.parse(responseBody);\r",
+													"            let test_name = pm.collectionVariables.get(\"c_ip_pname\")\r",
+													"            let current_output_name = jsonData.name[0].family\r",
+													"            if (test_name == current_output_name ) {\r",
+													"                console.log('== Family value is updated, Passed ==>', test_name, current_output_name )\r",
+													"                c_ip_pname = current_output_name\r",
+													"            }\r",
+													"            else{\r",
+													"                console.log('== Family value not updated, is failed ==>', test_name, current_output_name ) \r",
+													"            }\r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"patient is updated and patient given name (from array next level) is captured.\", () => {\r",
+													"            let jsonData = JSON.parse(responseBody);\r",
+													"            let test_name = pm.collectionVariables.get(\"c_patch_ip_pname_given\")\r",
+													"            let current_output_name_given = jsonData.name[0].given[0]\r",
+													"            if (test_name == current_output_name_given ) {\r",
+													"                console.log('== given value is updated, Passed ==>', test_name, current_output_name_given )\r",
+													"                c_ip_pname_given = current_output_name_given \r",
+													"            }\r",
+													"            else{\r",
+													"                console.log('== given value not updated, is failed ==>', test_name, current_output_name_given ) \r",
+													"            }    \r",
+													"        })\r",
+													"}\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "59dcac20-71d5-4f84-a295-2b04218eccd6",
+												"exec": [
+													"pm.collectionVariables.set(\"{c_pname_given\", \"Betala\");\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "ceb8cadf-8e4b-40dc-83e4-aeada9e73bdc",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/fhir+json",
+												"type": "text"
+											},
+											{
+												"key": "",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"resourceType\": \"Parameters\",\r\n    \"parameter\": [\r\n        {\r\n            \"name\": \"operation\",\r\n            \"part\": [\r\n                {\r\n                    \"name\": \"type\",\r\n                    \"valueCode\": \"replace\"\r\n                },\r\n                {\r\n                    \"name\": \"path\",\r\n                    \"valueString\": \"Patient.name[0]\"\r\n                },\r\n                {\r\n                    \"name\": \"value\",\r\n                    \"valueHumanName\": {\r\n                        \"family\": \"{{c_ip_pname}}\",\r\n                        \"given\": [\r\n                            \"{{c_ip_pname_given}}\"\r\n                        ]\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{c_base_url}}/R4/Patient/{{c_patient_id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_04_get patient details Padma",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "2965a758-4dd3-4a0e-a819-246cc904ba58",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "bf8cd517-c3f7-4f36-8ad8-ad894d9d5006",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"            pm.response.to.have.status(200);\r",
+													"        });\r",
+													"      \r",
+													"}\r",
+													"\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "e3d5b101-6dd1-4a0e-8b63-b01803ea4f97",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/fhir+json",
+												"type": "text"
+											},
+											{
+												"key": "id",
+												"value": "04da0df3-177f-4b7a-b572-a5c58d678b07",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{c_base_url}}/R4/Patient/{{c_patient_id}}"
+									},
+									"response": []
+								}
+							],
+							"_postman_id": "9a720302-4bda-4507-8132-e7426220b330",
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Observation Resource",
+							"item": [
+								{
+									"name": "UC_05_List of Observation",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "e05f2f7d-b696-4295-9c32-f1e12c49b4ec",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {\r",
+													"    pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Value is in valid list\", () => {  \r",
+													"pm.expect(pm.response.json().type).contains(\"history\");\r",
+													"pm.expect(pm.response.json().resourceType).to.be.contains(\"Bundle\");\r",
+													"   \r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "c431b357-41b6-4a86-b231-f16808872ebe",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"resourceType\": \"Observation\",\r\n  \"id\": \"example\",\r\n  \"text\": {\r\n    \"status\": \"generated\",\r\n    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"><p><b>Generated Narrative with Details</b></p><p><b>id</b>: example</p><p><b>status</b>: final</p><p><b>category</b>: Vital Signs <span>(Details : {http://terminology.hl7.org/CodeSystem/observation-category code 'vital-signs' = 'Vital Signs', given as 'Vital Signs'})</span></p><p><b>code</b>: Body Weight <span>(Details : {LOINC code '29463-7' = 'Body weight', given as 'Body Weight'}; {LOINC code '3141-9' = 'Body weight Measured', given as 'Body weight Measured'}; {SNOMED CT code '27113001' = 'Body weight', given as 'Body weight'}; {http://acme.org/devices/clinical-codes code 'body-weight' = 'body-weight', given as 'Body Weight'})</span></p><p><b>subject</b>: <a>Patient/example</a></p><p><b>encounter</b>: <a>Encounter/example</a></p><p><b>effective</b>: 28/03/2016</p><p><b>value</b>: 185 lbs<span> (Details: UCUM code [lb_av] = 'lb_av')</span></p></div>\"\r\n  },\r\n  \"status\": \"final\",\r\n  \"category\": [\r\n    {\r\n      \"coding\": [\r\n        {\r\n          \"system\": \"http://terminology.hl7.org/CodeSystem/observation-category\",\r\n          \"code\": \"vital-signs\",\r\n          \"display\": \"Vital Signs\"\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"code\": {\r\n    \"coding\": [\r\n      {\r\n        \"system\": \"http://loinc.org\",\r\n        \"code\": \"29463-7\",\r\n        \"display\": \"Body Weight\"\r\n      },\r\n      {\r\n        \"system\": \"http://loinc.org\",\r\n        \"code\": \"3141-9\",\r\n        \"display\": \"Body weight Measured\"\r\n      },\r\n      {\r\n        \"system\": \"http://snomed.info/sct\",\r\n        \"code\": \"27113001\",\r\n        \"display\": \"Body weight\"\r\n      },\r\n      {\r\n        \"system\": \"http://acme.org/devices/clinical-codes\",\r\n        \"code\": \"body-weight\",\r\n        \"display\": \"Body Weight\"\r\n      }\r\n    ]\r\n  },\r\n  \"subject\": {\r\n    \"reference\": \"Patient/example\"\r\n  },\r\n  \"encounter\": {\r\n    \"reference\": \"Encounter/example\"\r\n  },\r\n  \"effectiveDateTime\": \"2016-03-28\",\r\n  \"valueQuantity\": {\r\n    \"value\": 185,\r\n    \"unit\": \"lbs\",\r\n    \"system\": \"http://unitsofmeasure.org\",\r\n    \"code\": \"[lb_av]\"\r\n  }\r\n}",
+											"options": {}
+										},
+										"url": "{{c_base_url}}/R4/Observation/_history"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_06_create new Observation id!",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "4a115e6f-6bfb-473a-8187-f01f6c6408eb",
+												"exec": [
+													"pm.collectionVariables.set(\"c_observation_id\", \"0a8bb784-3983-4b81-8a27-946a1c04b095\");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "4c09c18d-9bfc-4d19-893d-3ba0b8de4758",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 201\", function () {\r",
+													"            pm.response.to.have.status(201);\r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"Status code name has string\", () => {\r",
+													"            pm.response.to.have.status(\"Created\");\r",
+													"        })\r",
+													"\r",
+													"        pm.test(\"Content-Type header is present\", () => {\r",
+													"        pm.response.to.have.header(\"Content-Type\");\r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"Content-Type header is application/fhir+json\", () => {\r",
+													"        pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/fhir+json; fhirVersion=4.0; charset=utf-8');\r",
+													"        \r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"patient is created and patientId is captured.\", () => {\r",
+													"            var jsonData = JSON.parse(responseBody);\r",
+													"            pm.collectionVariables.set(\"c_observation_id\", jsonData.id);\r",
+													"        });\r",
+													"}      \r",
+													"\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "e6857285-e403-40b6-ba0d-4780d45b56cc",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"resourceType\": \"Observation\",\r\n  \"text\": {\r\n    \"status\": \"generated\",\r\n    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"><p><b>Generated Narrative with Details</b></p><p><b>id</b>: example</p><p><b>status</b>: final</p><p><b>category</b>: Vital Signs <span>(Details : {http://terminology.hl7.org/CodeSystem/observation-category code 'vital-signs' = 'Vital Signs', given as 'Vital Signs'})</span></p><p><b>code</b>: Body Weight <span>(Details : {LOINC code '29463-7' = 'Body weight', given as 'Body Weight'}; {LOINC code '3141-9' = 'Body weight Measured', given as 'Body weight Measured'}; {SNOMED CT code '27113001' = 'Body weight', given as 'Body weight'}; {http://acme.org/devices/clinical-codes code 'body-weight' = 'body-weight', given as 'Body Weight'})</span></p><p><b>subject</b>: <a>Patient/example</a></p><p><b>encounter</b>: <a>Encounter/example</a></p><p><b>effective</b>: 28/03/2016</p><p><b>value</b>: 185 lbs<span> (Details: UCUM code [lb_av] = 'lb_av')</span></p></div>\"\r\n  },\r\n  \"status\": \"final\",\r\n  \"category\": [\r\n    {\r\n      \"coding\": [\r\n        {\r\n          \"system\": \"http://terminology.hl7.org/CodeSystem/observation-category\",\r\n          \"code\": \"vital-signs\",\r\n          \"display\": \"Vital Signs\"\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"code\": {\r\n    \"coding\": [\r\n      {\r\n        \"system\": \"http://loinc.org\",\r\n        \"code\": \"29463-7\",\r\n        \"display\": \"Body Weight\"\r\n      },\r\n      {\r\n        \"system\": \"http://loinc.org\",\r\n        \"code\": \"3141-9\",\r\n        \"display\": \"Body weight Measured\"\r\n      },\r\n      {\r\n        \"system\": \"http://snomed.info/sct\",\r\n        \"code\": \"27113001\",\r\n        \"display\": \"Body weight\"\r\n      },\r\n      {\r\n        \"system\": \"http://acme.org/devices/clinical-codes\",\r\n        \"code\": \"body-weight\",\r\n        \"display\": \"Body Weight\"\r\n      }\r\n    ]\r\n  },\r\n  \"subject\": {\r\n    \"reference\": \"Patient/example\"\r\n  },\r\n  \"encounter\": {\r\n    \"reference\": \"Encounter/example\"\r\n  },\r\n  \"effectiveDateTime\": \"2016-03-28\",\r\n  \"valueQuantity\": {\r\n    \"value\": 185,\r\n    \"unit\": \"lbs\",\r\n    \"system\": \"http://unitsofmeasure.org\",\r\n    \"code\": \"[lb_av]\"\r\n  }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{c_base_url}}/R4/Observation"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_07_Upsert Observation Id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "3efcd356-070c-4bb6-82ba-d83f3df9f3f9",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"patient exists or not?\", () => {\r",
+													"                    var jsonData = JSON.parse(responseBody);\r",
+													"                    \r",
+													"                    var observation_id = pm.collectionVariables.get(\"c_observation_id\")\r",
+													"                    var current_observation_id_from_output = jsonData.id\r",
+													"                    if (observation_id == current_observation_id_from_output){\r",
+													"                        console.log(\"== Observation id already exists, only updates ==>\", jsonData)\r",
+													"                    }\r",
+													"                    else{\r",
+													"                        console.log(\"== Observation doesn't exists, new observation id is created with updated fields ==>\", current_observation_id_from_output,jsonData)\r",
+													"                        c_observationt_id = current_observation_id_from_output \r",
+													"                    }\r",
+													"         \r",
+													"})\r",
+													"}\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "10d788be-6529-48cf-a9b8-39afc9913673",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"resourceType\": \"Observation\",\r\n  \"id\": \"{{c_observation_id}}\",\r\n  \"text\": {\r\n    \"status\": \"generated\",\r\n    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"><p><b>Generated Narrative with Details</b></p><p><b>id</b>: example</p><p><b>status</b>: final</p><p><b>category</b>: Vital Signs <span>(Details : {http://terminology.hl7.org/CodeSystem/observation-category code 'vital-signs' = 'Vital Signs', given as 'Vital Signs'})</span></p><p><b>code</b>: Body Weight <span>(Details : {LOINC code '29463-7' = 'Body weight', given as 'Body Weight'}; {LOINC code '3141-9' = 'Body weight Measured', given as 'Body weight Measured'}; {SNOMED CT code '27113001' = 'Body weight', given as 'Body weight'}; {http://acme.org/devices/clinical-codes code 'body-weight' = 'body-weight', given as 'Body Weight'})</span></p><p><b>subject</b>: <a>Patient/example</a></p><p><b>encounter</b>: <a>Encounter/example</a></p><p><b>effective</b>: 28/03/2016</p><p><b>value</b>: 185 lbs<span> (Details: UCUM code [lb_av] = 'lb_av')</span></p></div>\"\r\n  },\r\n  \"status\": \"final\",\r\n  \"category\": [\r\n    {\r\n      \"coding\": [\r\n        {\r\n          \"system\": \"http://terminology.hl7.org/CodeSystem/observation-category\",\r\n          \"code\": \"vital-signs\",\r\n          \"display\": \"Vital Signs\"\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"code\": {\r\n    \"coding\": [\r\n      {\r\n        \"system\": \"http://loinc.org\",\r\n        \"code\": \"29463-7\",\r\n        \"display\": \"Body Weight\"\r\n      },\r\n      {\r\n        \"system\": \"http://loinc.org\",\r\n        \"code\": \"3141-9\",\r\n        \"display\": \"Body weight Measured\"\r\n      },\r\n      {\r\n        \"system\": \"http://snomed.info/sct\",\r\n        \"code\": \"27113001\",\r\n        \"display\": \"Body weight\"\r\n      },\r\n      {\r\n        \"system\": \"http://acme.org/devices/clinical-codes\",\r\n        \"code\": \"body-weight\",\r\n        \"display\": \"Body Weight\"\r\n      }\r\n    ]\r\n  },\r\n  \"subject\": {\r\n    \"reference\": \"Patient/example\"\r\n  },\r\n  \"encounter\": {\r\n    \"reference\": \"Encounter/example\"\r\n  },\r\n  \"effectiveDateTime\": \"2016-07-28\",\r\n  \"valueQuantity\": {\r\n    \"value\": 185,\r\n    \"unit\": \"lbs\",\r\n    \"system\": \"http://unitsofmeasure.org\",\r\n    \"code\": \"[lb_av]\"\r\n  }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{c_base_url}}/R4/Observation/{{c_observation_id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_08_update Observation details!",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "e6b9916e-0fd5-4593-9976-8d65f8a042b8",
+												"exec": [
+													"try {\r",
+													"     \r",
+													"    pm.test(\"the Observation status can have any values among(final,registered,preliminary,amended etc).\", () => {\r",
+													"        data = pm.request.body;\r",
+													"        body = data[data.mode];\r",
+													"        jsonData = JSON.parse(body);\r",
+													"\r",
+													"        arrayOfObject = jsonData.parameter[0].part\r",
+													"\r",
+													"        var result = arrayOfObject.find(obj => {\r",
+													"                return obj.name === \"value\"\r",
+													"            })\r",
+													"        console.log(jsonData.resourceType)\r",
+													"        console.log(result)\r",
+													"\r",
+													"        pm.expect(result.valueString).to.be.oneOf([\"final\", \"registered\", \"preliminary\", \"amended\", \"corrected\", \"cancelled\",\"entered-an-error\", \"unknown\"]);\r",
+													"        console.log(\"successful\")\r",
+													"    });\r",
+													"}        \r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "5e06cdb3-04b5-4aa9-a30b-e343bade5f6c",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"        });\r",
+													"}\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "7d602452-5028-4ae7-8a2d-87c0d90c2b14",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"resourceType\": \"Parameters\",\r\n  \"parameter\": [\r\n    {\r\n      \"name\": \"operation\",\r\n      \"part\": [\r\n        {\r\n          \"name\": \"type\",\r\n          \"valueCode\": \"replace\"\r\n        },\r\n        {\r\n          \"name\": \"path\",\r\n          \"valueString\": \"Observation.status\"\r\n        },\r\n        {\r\n          \"name\": \"value\",\r\n          \"valueString\": \"final\" \r\n        }\r\n      ]\r\n    },\r\n     {\r\n      \"name\": \"operation\",\r\n      \"part\": [\r\n        {\r\n          \"name\": \"type\",\r\n          \"valueCode\": \"replace\"\r\n        },\r\n        {\r\n          \"name\": \"path\",\r\n          \"valueString\": \"effective\"\r\n        },\r\n        {\r\n          \"name\": \"value\",\r\n          \"valuedateTime\": \"2016-03-30\"\r\n        }\r\n      ]\r\n    }   \r\n  ] \r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{c_base_url}}/R4/Observation/{{c_observation_id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_09_get Observation Id!",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "0626ef7b-b052-42ae-bb5e-c7d0384609d8",
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "e1fc98d2-cc9f-441b-815d-6daa0ddb7b77",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"            pm.response.to.have.status(200);\r",
+													"        });\r",
+													"      \r",
+													"}\r",
+													"\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}   "
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "f455d538-cc0e-4d00-a0ce-d2454e249cae",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {}
+										},
+										"url": "{{c_base_url}}/R4/Observation/{{c_observation_id}}"
+									},
+									"response": []
+								}
+							],
+							"_postman_id": "66274fe2-98dd-4cb0-becf-20edea194927",
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "AllergyIntolerance Resource",
+							"item": [
+								{
+									"name": "UC_10_List of AllergyIntolerance!",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "6956c549-0764-4188-8282-4b4e42df9030",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"            pm.response.to.have.status(200);\r",
+													"        });\r",
+													"      \r",
+													"}\r",
+													"\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"} "
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "9837d34c-1532-47d7-ae1c-b087b8d257ad",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {}
+											}
+										},
+										"url": "{{c_base_url}}/R4/AllergyIntolerance"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_10_List of AllergyIntolerance history!",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "6956c549-0764-4188-8282-4b4e42df9030",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"            pm.response.to.have.status(200);\r",
+													"        });\r",
+													"      \r",
+													"}\r",
+													"\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"} "
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "aa22c070-c901-40df-acf9-2b83d9f9ceb2",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {}
+											}
+										},
+										"url": "{{c_base_url}}/R4/AllergyIntolerance/_history"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_11_create new AllergyIntolerance Id!",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "14b7227b-2a72-4a38-aff9-5fe347400d43",
+												"exec": [
+													"pm.collectionVariables.set(\"c_allergyIntolerance_id\", \"0a8bb784-3983-4b81-8a27-946a1c04b095\");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "cac36766-5ba4-4ec0-8900-07c811524147",
+												"exec": [
+													"pm.collectionVariables.set(\"c_allergyintolerance_id\", \"0a8bb784-3983-4b81-8a27-946a1c04b095\");\r",
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 201\", function () {\r",
+													"            pm.response.to.have.status(201);\r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"Status code name has string\", () => {\r",
+													"            pm.response.to.have.status(\"Created\");\r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"patient is created and patientId is captured.\", () => {\r",
+													"            var jsonData = JSON.parse(responseBody);\r",
+													"            pm.collectionVariables.set(\"c_allergyIntolerance_id\", jsonData.id);\r",
+													"        });\r",
+													"}      \r",
+													"\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "a33c3db3-804b-4683-96fa-7c39b12ce62f",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"resourceType\": \"AllergyIntolerance\",\r\n  \"text\": {\r\n    \"status\": \"generated\",\r\n    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"><p><b>Generated Narrative with Details</b></p><p><b>id</b>: example</p><p><b>identifier</b>: 49476534</p><p><b>clinicalStatus</b>: Active <span>(Details : {http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical code 'active' = 'Active', given as 'Active'})</span></p><p><b>verificationStatus</b>: Confirmed <span>(Details : {http://terminology.hl7.org/CodeSystem/allergyintolerance-verification code 'confirmed' = 'Confirmed', given as 'Confirmed'})</span></p><p><b>type</b>: allergy</p><p><b>category</b>: food</p><p><b>criticality</b>: high</p><p><b>code</b>: Cashew nuts <span>(Details : {SNOMED CT code '227493005' = 'Cashew nuts', given as 'Cashew nuts'})</span></p><p><b>patient</b>: <a>Patient/example</a></p><p><b>onset</b>: 01/01/2004</p><p><b>recordedDate</b>: 09/10/2014 2:58:00 PM</p><p><b>recorder</b>: <a>Practitioner/example</a></p><p><b>asserter</b>: <a>Patient/example</a></p><p><b>lastOccurrence</b>: 01/06/2012</p><p><b>note</b>: The criticality is high becasue of the observed anaphylactic reaction when challenged with cashew extract.</p><blockquote><p><b>reaction</b></p><p><b>substance</b>: cashew nut allergenic extract Injectable Product <span>(Details : {RxNorm code '1160593' = 'cashew nut allergenic extract Injectable Product', given as 'cashew nut allergenic extract Injectable Product'})</span></p><p><b>manifestation</b>: Anaphylactic reaction <span>(Details : {SNOMED CT code '39579001' = 'Anaphylaxis', given as 'Anaphylactic reaction'})</span></p><p><b>description</b>: Challenge Protocol. Severe reaction to subcutaneous cashew extract. Epinephrine administered</p><p><b>onset</b>: 12/06/2012</p><p><b>severity</b>: severe</p><p><b>exposureRoute</b>: Subcutaneous route <span>(Details : {SNOMED CT code '34206005' = 'Subcutaneous route', given as 'Subcutaneous route'})</span></p></blockquote><blockquote><p><b>reaction</b></p><p><b>manifestation</b>: Urticaria <span>(Details : {SNOMED CT code '64305001' = 'Urticaria', given as 'Urticaria'})</span></p><p><b>onset</b>: 01/01/2004</p><p><b>severity</b>: moderate</p><p><b>note</b>: The patient reports that the onset of urticaria was within 15 minutes of eating cashews.</p></blockquote></div>\"\r\n  },\r\n  \"identifier\": [\r\n    {\r\n      \"system\": \"http://acme.com/ids/patients/risks\",\r\n      \"value\": \"49476534\"\r\n    }\r\n  ],\r\n  \"clinicalStatus\": {\r\n    \"coding\": [\r\n      {\r\n        \"system\": \"http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical\",\r\n        \"code\": \"active\",\r\n        \"display\": \"Active\"\r\n      }\r\n    ]\r\n  },\r\n  \"verificationStatus\": {\r\n    \"coding\": [\r\n      {\r\n        \"system\": \"http://terminology.hl7.org/CodeSystem/allergyintolerance-verification\",\r\n        \"code\": \"confirmed\",\r\n        \"display\": \"Confirmed\"\r\n      }\r\n    ]\r\n  },\r\n  \"type\": \"allergy\",\r\n  \"category\": [\r\n    \"food\"\r\n  ],\r\n  \"criticality\": \"high\",\r\n  \"code\": {\r\n    \"coding\": [\r\n      {\r\n        \"system\": \"http://snomed.info/sct\",\r\n        \"code\": \"227493005\",\r\n        \"display\": \"Cashew nuts\"\r\n      }\r\n    ]\r\n  },\r\n  \"patient\": {\r\n    \"reference\": \"Patient/example\"\r\n  },\r\n  \"onsetDateTime\": \"2004\",\r\n  \"recordedDate\": \"2014-10-09T14:58:00+11:00\",\r\n  \"recorder\": {\r\n    \"reference\": \"Practitioner/example\"\r\n  },\r\n  \"asserter\": {\r\n    \"reference\": \"Patient/example\"\r\n  },\r\n  \"lastOccurrence\": \"2012-06\",\r\n  \"note\": [\r\n    {\r\n      \"text\": \"The criticality is high becasue of the observed anaphylactic reaction when challenged with cashew extract.\"\r\n    }\r\n  ],\r\n  \"reaction\": [\r\n    {\r\n      \"substance\": {\r\n        \"coding\": [\r\n          {\r\n            \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\r\n            \"code\": \"1160593\",\r\n            \"display\": \"cashew nut allergenic extract Injectable Product\"\r\n          }\r\n        ]\r\n      },\r\n      \"manifestation\": [\r\n        {\r\n          \"coding\": [\r\n            {\r\n              \"system\": \"http://snomed.info/sct\",\r\n              \"code\": \"39579001\",\r\n              \"display\": \"Anaphylactic reaction\"\r\n            }\r\n          ]\r\n        }\r\n      ],\r\n      \"description\": \"Challenge Protocol. Severe reaction to subcutaneous cashew extract. Epinephrine administered\",\r\n      \"onset\": \"2012-06-12\",\r\n      \"severity\": \"severe\",\r\n      \"exposureRoute\": {\r\n        \"coding\": [\r\n          {\r\n            \"system\": \"http://snomed.info/sct\",\r\n            \"code\": \"34206005\",\r\n            \"display\": \"Subcutaneous route\"\r\n          }\r\n        ]\r\n      }\r\n    },\r\n    {\r\n      \"manifestation\": [\r\n        {\r\n          \"coding\": [\r\n            {\r\n              \"system\": \"http://snomed.info/sct\",\r\n              \"code\": \"64305001\",\r\n              \"display\": \"Urticaria\"\r\n            }\r\n          ]\r\n        }\r\n      ],\r\n      \"onset\": \"2004\",\r\n      \"severity\": \"moderate\",\r\n      \"note\": [\r\n        {\r\n          \"text\": \"The patient reports that the onset of urticaria was within 15 minutes of eating cashews.\"\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{c_base_url}}/R4/AllergyIntolerance"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_12_upsert AllergyIntolerance!",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "da2f2a65-f9e0-4aa2-88ae-347a43ec7596",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"        });\r",
+													"\r",
+													"        pm.test(\"patient exists or not?\", () => {\r",
+													"                    var jsonData = JSON.parse(responseBody);\r",
+													"                    var allergyIntolerance_id = pm.collectionVariables.get(\"c_allergyIntolerance_id\")\r",
+													"                    var current_observation_id_from_output = jsonData.id\r",
+													"                    if (allergyIntolerance_id == current_observation_id_from_output){\r",
+													"                        console.log(\"== Observation id already exists, only updates ==>\", jsonData)\r",
+													"                    }\r",
+													"                    else{\r",
+													"                        console.log(\"== Observation doesn't exists, new observation id is created with updated fields ==>\", current_observation_id_from_output,jsonData)\r",
+													"                        c_allergyIntolerance_id = current_observation_id_from_output \r",
+													"                    }\r",
+													"         \r",
+													"})\r",
+													"}\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "ce66b38e-a7ae-42b0-b30a-cc604442af92",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"resourceType\": \"AllergyIntolerance\",\r\n  \"id\": \"{{c_allergyIntolerance_id}}\",\r\n  \"text\": {\r\n    \"status\": \"generated\",\r\n    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"><p><b>Generated Narrative with Details</b></p><p><b>id</b>: example</p><p><b>identifier</b>: 49476534</p><p><b>clinicalStatus</b>: Active <span>(Details : {http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical code 'active' = 'Active', given as 'Active'})</span></p><p><b>verificationStatus</b>: Confirmed <span>(Details : {http://terminology.hl7.org/CodeSystem/allergyintolerance-verification code 'confirmed' = 'Confirmed', given as 'Confirmed'})</span></p><p><b>type</b>: allergy</p><p><b>category</b>: food</p><p><b>criticality</b>: high</p><p><b>code</b>: Cashew nuts <span>(Details : {SNOMED CT code '227493005' = 'Cashew nuts', given as 'Cashew nuts'})</span></p><p><b>patient</b>: <a>Patient/example</a></p><p><b>onset</b>: 01/01/2004</p><p><b>recordedDate</b>: 09/10/2014 2:58:00 PM</p><p><b>recorder</b>: <a>Practitioner/example</a></p><p><b>asserter</b>: <a>Patient/example</a></p><p><b>lastOccurrence</b>: 01/06/2012</p><p><b>note</b>: The criticality is high becasue of the observed anaphylactic reaction when challenged with cashew extract.</p><blockquote><p><b>reaction</b></p><p><b>substance</b>: cashew nut allergenic extract Injectable Product <span>(Details : {RxNorm code '1160593' = 'cashew nut allergenic extract Injectable Product', given as 'cashew nut allergenic extract Injectable Product'})</span></p><p><b>manifestation</b>: Anaphylactic reaction <span>(Details : {SNOMED CT code '39579001' = 'Anaphylaxis', given as 'Anaphylactic reaction'})</span></p><p><b>description</b>: Challenge Protocol. Severe reaction to subcutaneous cashew extract. Epinephrine administered</p><p><b>onset</b>: 12/06/2012</p><p><b>severity</b>: severe</p><p><b>exposureRoute</b>: Subcutaneous route <span>(Details : {SNOMED CT code '34206005' = 'Subcutaneous route', given as 'Subcutaneous route'})</span></p></blockquote><blockquote><p><b>reaction</b></p><p><b>manifestation</b>: Urticaria <span>(Details : {SNOMED CT code '64305001' = 'Urticaria', given as 'Urticaria'})</span></p><p><b>onset</b>: 01/01/2004</p><p><b>severity</b>: moderate</p><p><b>note</b>: The patient reports that the onset of urticaria was within 15 minutes of eating cashews.</p></blockquote></div>\"\r\n  },\r\n  \"identifier\": [\r\n    {\r\n      \"system\": \"http://acme.com/ids/patients/risks\",\r\n      \"value\": \"49476534\"\r\n    }\r\n  ],\r\n  \"clinicalStatus\": {\r\n    \"coding\": [\r\n      {\r\n        \"system\": \"http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical\",\r\n        \"code\": \"active\",\r\n        \"display\": \"Active\"\r\n      }\r\n    ]\r\n  },\r\n  \"verificationStatus\": {\r\n    \"coding\": [\r\n      {\r\n        \"system\": \"http://terminology.hl7.org/CodeSystem/allergyintolerance-verification\",\r\n        \"code\": \"confirmed\",\r\n        \"display\": \"Confirmed\"\r\n      }\r\n    ]\r\n  },\r\n  \"type\": \"allergy\",\r\n  \"category\": [\r\n    \"food\"\r\n  ],\r\n  \"criticality\": \"high\",\r\n  \"code\": {\r\n    \"coding\": [\r\n      {\r\n        \"system\": \"http://snomed.info/sct\",\r\n        \"code\": \"227493005\",\r\n        \"display\": \"Cashew nuts\"\r\n      }\r\n    ]\r\n  },\r\n  \"patient\": {\r\n    \"reference\": \"Patient/example\"\r\n  },\r\n  \"onsetDateTime\": \"2004\",\r\n  \"recordedDate\": \"2014-10-09T14:58:00+11:00\",\r\n  \"recorder\": {\r\n    \"reference\": \"Practitioner/example\"\r\n  },\r\n  \"asserter\": {\r\n    \"reference\": \"Patient/example\"\r\n  },\r\n  \"lastOccurrence\": \"2012-06\",\r\n  \"note\": [\r\n    {\r\n      \"text\": \"The criticality is high becasue of the observed anaphylactic reaction when challenged with cashew extract.\"\r\n    }\r\n  ],\r\n  \"reaction\": [\r\n    {\r\n      \"substance\": {\r\n        \"coding\": [\r\n          {\r\n            \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\r\n            \"code\": \"1160593\",\r\n            \"display\": \"cashew nut allergenic extract Injectable Product\"\r\n          }\r\n        ]\r\n      },\r\n      \"manifestation\": [\r\n        {\r\n          \"coding\": [\r\n            {\r\n              \"system\": \"http://snomed.info/sct\",\r\n              \"code\": \"39579001\",\r\n              \"display\": \"Anaphylactic reaction\"\r\n            }\r\n          ]\r\n        }\r\n      ],\r\n      \"description\": \"Challenge Protocol. Severe reaction to subcutaneous cashew extract. Epinephrine administered\",\r\n      \"onset\": \"2012-06-12\",\r\n      \"severity\": \"severe\",\r\n      \"exposureRoute\": {\r\n        \"coding\": [\r\n          {\r\n            \"system\": \"http://snomed.info/sct\",\r\n            \"code\": \"34206005\",\r\n            \"display\": \"Subcutaneous route\"\r\n          }\r\n        ]\r\n      }\r\n    },\r\n    {\r\n      \"manifestation\": [\r\n        {\r\n          \"coding\": [\r\n            {\r\n              \"system\": \"http://snomed.info/sct\",\r\n              \"code\": \"64305001\",\r\n              \"display\": \"Urticaria\"\r\n            }\r\n          ]\r\n        }\r\n      ],\r\n      \"onset\": \"2004\",\r\n      \"severity\": \"moderate\",\r\n      \"note\": [\r\n        {\r\n          \"text\": \"The patient reports that the onset of urticaria was within 15 minutes of eating cashews.\"\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{c_base_url}}/R4/AllergyIntolerance/{{c_allergyIntolerance_id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_13_update AllergyIntolerance criticality!",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "0f1f3e13-f9c8-46f2-bc30-e993d6b5dda7",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"        });\r",
+													"}\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "ce058ec1-c63b-4231-b5e9-e718481dfb72",
+												"exec": [
+													"try {\r",
+													"     \r",
+													"    pm.test(\"the Observation status can have any values among(final,registered,preliminary,amended etc).\", () => {\r",
+													"        data = pm.request.body;\r",
+													"        body = data[data.mode];\r",
+													"        jsonData = JSON.parse(body);\r",
+													"\r",
+													"        arrayOfObject = jsonData.parameter[0].part\r",
+													"\r",
+													"        var result = arrayOfObject.find(obj => {\r",
+													"                return obj.name === \"value\"\r",
+													"            })\r",
+													"        console.log(jsonData.resourceType)\r",
+													"        console.log(result)\r",
+													"\r",
+													"        pm.expect(result.valueString).to.be.oneOf([\"high\", \"low\", \"unable-to-assess\"]);\r",
+													"        console.log(\"successful\")\r",
+													"    });\r",
+													"}        \r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "6c336edc-aba3-4ea6-ab70-e1c89801630e",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"resourceType\": \"Parameters\",\r\n  \"parameter\": [\r\n    {\r\n      \"name\": \"operation\",\r\n      \"part\": [\r\n        {\r\n          \"name\": \"type\",\r\n          \"valueString\": \"replace\"\r\n        },\r\n        {\r\n          \"name\": \"path\",\r\n          \"valueString\": \"AllergyIntolerance.criticality\"\r\n        },\r\n        {\r\n          \"name\": \"value\",\r\n          \"valueString\": \"high\" \r\n        }\r\n        ]\r\n    }\r\n  ]\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{c_base_url}}/AllergyIntolerance/{{c_allergyIntolerance_id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_14_get AllergyIntolerance Id!",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f95d52e7-4155-419a-9ae8-8814bfe42008",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"            pm.response.to.have.status(200);\r",
+													"        });\r",
+													"      \r",
+													"}\r",
+													"\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"} "
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "20b63527-cc2b-4a14-b8bd-6ec57dff9cb4",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {}
+											}
+										},
+										"url": "{{c_base_url}}/R4/AllergyIntolerance/{{c_allergyIntolerance_id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "UC_14_get AllergyIntolerance history!",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f95d52e7-4155-419a-9ae8-8814bfe42008",
+												"exec": [
+													"try {\r",
+													"    // Check for a non-error response code\r",
+													"    if (pm.response.code >= 400) {\r",
+													"        console.log(`ERROR :: ${pm.response.code} response from API.`);\r",
+													"\r",
+													"        throw new Error('Error response from API.');\r",
+													"    }\r",
+													"        pm.test(\"Status code is 200\", function () {\r",
+													"            pm.response.to.have.status(200);\r",
+													"        });\r",
+													"      \r",
+													"}\r",
+													"\r",
+													"catch (e) {\r",
+													"    // The data probably didn't match the expected values\r",
+													"    console.log(`ERROR :: ${e.message}`);\r",
+													"    console.log(pm.response.text());\r",
+													"\r",
+													"    throw e;\r",
+													"} "
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"_postman_id": "658551b3-0cdb-462a-bdd3-4d26173e432a",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {}
+											}
+										},
+										"url": "{{c_base_url}}/R4/AllergyIntolerance/{{c_allergyIntolerance_id}}/_history"
+									},
+									"response": []
+								}
+							],
+							"_postman_id": "7db9119b-8c22-4a2b-8e16-bd07c6ac836d",
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_id": "451b8330-f831-420a-8e92-1122c57f6764",
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Whole System Interactions",
+					"item": [],
+					"_postman_id": "eccd08ad-bb29-415c-87d5-3dcef85905dc",
+					"_postman_isSubFolder": true
+				}
+			],
+			"_postman_id": "901c389a-bf21-4834-8dfa-1fd923454c64"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "7d934ab9-ad9d-4059-88dc-9a27c6bd3ae8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "00736b3a-8ff3-447e-b48c-f066887a589b",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "265796e6-c08a-4736-bf5c-87291beefbc0",
+			"key": "c_ip_pname",
+			"value": "Ramanaidu",
+			"type": "string"
+		},
+		{
+			"id": "8de6c72a-a49c-4b51-9c6f-0372e16b6df7",
+			"key": "c_patient_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "ae71b63f-dd35-4493-ae00-5daf5b2babcc",
+			"key": "c_ip_pname_given",
+			"value": "Betala",
+			"type": "string"
+		},
+		{
+			"id": "c431a3b1-f928-4cb1-a4db-2daec6fd1844",
+			"key": "c_base_url",
+			"value": "https://server.fire.ly",
+			"type": "string"
+		},
+		{
+			"id": "c4f81717-04be-4425-9d1e-bbf51cb1f77b",
+			"key": "c_observation_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "53fe334e-55d9-40fe-807e-0bca5c547ebe",
+			"key": "{c_pname_given",
+			"value": "",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"id": "d284c29e-9973-473a-9b98-fbdb8f5f2599",
+			"key": "c_allergyintolerance_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "3d277456-7bd5-4a4f-a85e-562f97fc11bd",
+			"key": "c_allergyIntolerance_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "d5a5be0d-e166-4db6-8d8b-a82d36da4fd4",
+			"key": "{c_pname_given",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

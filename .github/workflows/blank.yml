@@ -27,5 +27,5 @@ jobs:
       - name: Create dir
         run: |
           newman run postman login --with-api-key {{postman-api-key-here}}
-postman collection run 13603091-ff0458f6-9c1a-45b6-9f05-8709e32e1c93 -e 13603091-eb0ab5a7-8d61-42d1-9f13-bd072d6cfcef
+          postman collection run 13603091-ff0458f6-9c1a-45b6-9f05-8709e32e1c93 -e 13603091-eb0ab5a7-8d61-42d1-9f13-bd072d6cfcef
 

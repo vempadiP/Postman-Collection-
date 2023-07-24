@@ -36,11 +36,10 @@ jobs:
       # Install Newman
       - name: Install newman
         run: |
-          npm install -g newman
+          npm install -g newma 
 
       # run collection
       - uses: actions/checkout@v3
       - name: Create dir
         run: |
-          newman run postman login --with-api-key ${{secrets.POSTMAN_API_KEY}}
-postman collection run 13603091-ff0458f6-9c1a-45b6-9f05-8709e32e1c93 -e 13603091-eb0ab5a7-8d61-42d1-9f13-bd072d6cfcef
+          newman run postman login --with-api-key ${{secrets.POSTMAN_API_KEY}} postman collection run 13603091-ff0458f6-9c1a-45b6-9f05-8709e32e1c93 -e 13603091-eb0ab5a7-8d61-42d1-9f13-bd072d6cfcef

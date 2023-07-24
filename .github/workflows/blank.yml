@@ -18,11 +18,27 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: windows
+    runs-on: ubuntu-latest
 
-    # run collection
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      - name: Create dir
+        run: |
+          mkdir SampleArtifact
+
+      # Install NodeJS
+      - name: Install Node
+        uses: actions/checkout@v3
+        with:   
+          node-version: 'v14.15.1'
+
+      # Install Newman
+      - name: Install newman
+        run: |
+          npm install -g newman
+
+      # run collection
       - uses: actions/checkout@v3
       - name: Create dir
         run: |
